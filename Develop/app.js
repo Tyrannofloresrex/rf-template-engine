@@ -5,7 +5,9 @@ const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
 const render = require("./lib/htmlRenderer");
+const { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } = require("constants");
 
+// Array stores Employee info
 const currentEmployees = []
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
@@ -14,8 +16,7 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 
 
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
+// Inquirer prompt asks user series of questions about typical employees
 function mainQuestions(){
     inquirer.prompt([
     {
@@ -39,6 +40,7 @@ function mainQuestions(){
         message: "What is the employee's role with the company?",
         choices: ["Manager", "Engineer", "Intern"],
     }
+        // Prompt moves into switch case to determine what type of Employee is answering mainQuestions, then asks specific questions based on that extended Employee class.
         ]).then ((info) =>{
             switch (info.role) {
             case "Manager":
@@ -57,7 +59,7 @@ function mainQuestions(){
 } 
 mainQuestions()
 
-
+// Specific question for Manager class.
 function getOfficeNum(info){
     inquirer.prompt ([
         {
@@ -73,7 +75,7 @@ function getOfficeNum(info){
     }) 
     return
 }
-
+// Specific question for Engineer class
 function getGithub(info){
     inquirer.prompt([
         {
@@ -88,7 +90,7 @@ function getGithub(info){
     })
     return
 }
-
+// Specific question for Intern class
 function getSchool(info){
     inquirer.prompt([
         {
@@ -103,7 +105,7 @@ function getSchool(info){
     })
     return
 }
-
+// After Employee based questions are answered, user is prompted to make another employee profile or render employee information to html
 function askMore() {
     inquirer.prompt([
         {
@@ -111,11 +113,12 @@ function askMore() {
             name: "confirm",
             message: "Do you want to add another employee? If not, we will now render your employees."
         }
+        // If user confirms "yes", the question suite runs again, if "no" render function begins
     ]).then (confirm => {
         if (confirm.confirm === true) {
             
             return mainQuestions()
-            
+        // Uses render function to put Employee object info into HTML format and then writes to HTML page
         } fs.writeFile("employees.html", render(currentEmployees), (err) => {
         
             if (err) {
@@ -128,7 +131,7 @@ function askMore() {
         
     })
 }
-
+// Function adds Employee objects to array
 function addEmployee (employee) {
     currentEmployees.push(employee)
     askMore()
